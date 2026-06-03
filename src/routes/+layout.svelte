@@ -1,38 +1,27 @@
 <script>
 	import { onMount } from 'svelte';
-	import { browser } from '$app/environment';
 	import favicon from '$lib/assets/favicon.svg';
 	import { counters } from '$lib/counter.svelte';
 
 	let { children } = $props();
 
-	/** Ask the service worker for the current time; fall back to the local clock. */
-	function checkTime() {
-		if (!browser) return;
-		const sw = navigator.serviceWorker?.controller;
-		if (sw) {
-			sw.postMessage({ type: 'GET_TIME' });
-		} else {
-			// SW not controlling the page yet (first load / dev): use local clock.
-			counters.applyNow(Date.now());
-		}
-	}
-
 	onMount(() => {
+		// Local clock drives both the live "time until reset" display and the
+		// period reset/streak reconciliation.
+		const tick = () => counters.tick(Date.now());
+		const onVisible = () => {
+			if (document.visibilityState === 'visible') tick();
+		};
 		/** @param {MessageEvent} event */
 		const onMessage = (event) => {
-			if (event.data?.type === 'TIME') counters.applyNow(event.data.now);
-		};
-		const onVisible = () => {
-			if (document.visibilityState === 'visible') checkTime();
+			if (event.data?.type === 'TIME') counters.tick(event.data.now);
 		};
 
 		navigator.serviceWorker?.addEventListener('message', onMessage);
 		document.addEventListener('visibilitychange', onVisible);
 
-		checkTime();
-		// Light heartbeat so resets also fire live while the tab stays open.
-		const interval = setInterval(checkTime, 30_000);
+		tick();
+		const interval = setInterval(tick, 1000);
 
 		return () => {
 			clearInterval(interval);

@@ -22,7 +22,7 @@
 	function save() {
 		const trimmed = name.trim();
 		const g = Number(goal);
-		if (!trimmed || !Number.isFinite(g) || g === 0) return;
+		if (!trimmed || !Number.isFinite(g)) return;
 		if (isNew) {
 			counters.add(trimmed, g, period);
 		} else if (existing) {

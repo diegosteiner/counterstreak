@@ -1,5 +1,12 @@
 <script>
-	import { counters, PERIOD_LABELS, goalReached, goalProgress } from '$lib/counter.svelte';
+	import {
+		counters,
+		PERIOD_LABELS,
+		goalReached,
+		goalProgress,
+		nextBucket,
+		formatDuration
+	} from '$lib/counter.svelte';
 </script>
 
 <svelte:head>
@@ -29,11 +36,21 @@
 						</span>
 						<a class="edit" href="/edit/{item.id}" aria-label="Edit {item.name}">Edit</a>
 					</div>
+
+					{#if item.lostStreak > 0}
+						<button class="restore" onclick={() => counters.restoreStreak(item.id)}>
+							Restore streak 🔥 {item.lostStreak}
+						</button>
+					{/if}
+
 					<output class="count">{item.count}</output>
 					<div class="target">
 						{#if countDown}{item.count} → 0{:else}{item.count} / {item.goal}{/if}
 					</div>
-					<div class="period">Resets {PERIOD_LABELS[item.period].toLowerCase()}</div>
+					<div class="period">
+						{PERIOD_LABELS[item.period]} · resets in
+						{formatDuration(nextBucket(item.period, item.bucket) - counters.now)}
+					</div>
 					<div
 						class="bar"
 						role="progressbar"
@@ -233,7 +250,24 @@
 	.period {
 		color: #64748b;
 		font-size: 0.8rem;
-		text-transform: capitalize;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.restore {
+		align-self: stretch;
+		background: #422006;
+		border: 1px solid #b45309;
+		color: #fdba74;
+		border-radius: 0.5rem;
+		padding: 0.5rem 0.75rem;
+		font-size: 0.85rem;
+		font-weight: 600;
+		cursor: pointer;
+	}
+
+	.restore:hover {
+		background: #532e0a;
+		border-color: #f59e0b;
 	}
 
 	.bar {
@@ -280,9 +314,9 @@
 
 	/* The button that moves toward the goal is emphasized as the main action. */
 	.circle.primary {
-		width: 4rem;
-		height: 4rem;
-		font-size: 2rem;
+		width: 5.5rem;
+		height: 5.5rem;
+		font-size: 2.75rem;
 		color: #0f172a;
 		background: #38bdf8;
 	}
@@ -292,9 +326,9 @@
 	}
 
 	.circle.secondary {
-		width: 3.25rem;
-		height: 3.25rem;
-		font-size: 1.6rem;
+		width: 3rem;
+		height: 3rem;
+		font-size: 1.5rem;
 		color: #cbd5e1;
 		background: #334155;
 	}

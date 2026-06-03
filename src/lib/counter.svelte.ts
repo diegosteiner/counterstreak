@@ -31,12 +31,13 @@ export function counterStart(goal: number): number {
 
 /**
  * Whether the goal has been met: reaching `goal` while counting up, or reaching
- * 0 (or below) while counting down.
+ * 0 (or below) while counting down. A goal of 0 is always met (count-up).
  * @param {number} count
  * @param {number} goal
  * @returns {boolean}
  */
 export function goalReached(count: number, goal: number): boolean {
+	if (goal === 0) return true;
 	return goal < 0 ? count <= 0 : count >= goal;
 }
 
@@ -58,6 +59,24 @@ export function goalProgress(count: number, goal: number): number {
 	return Math.max(0, Math.min(1, frac));
 }
 
+/**
+ * Human-friendly "time left" string for a millisecond duration, e.g. `42s`,
+ * `12m`, `3h 20m`, `2d 4h`. Returns `now` at or past zero.
+ * @param {number} ms
+ * @returns {string}
+ */
+export function formatDuration(ms: number): string {
+	if (ms <= 0) return 'now';
+	const totalSec = Math.floor(ms / 1000);
+	if (totalSec < 60) return `${totalSec}s`;
+	const totalMin = Math.floor(totalSec / 60);
+	if (totalMin < 60) return `${totalMin}m`;
+	const totalHr = Math.floor(totalMin / 60);
+	if (totalHr < 24) return `${totalHr}h ${totalMin % 60}m`;
+	const days = Math.floor(totalHr / 24);
+	return `${days}d ${totalHr % 24}h`;
+}
+
 /** A single named counter with a target (goal) value and a reset period. */
 export interface CounterItem {
 	id: string;
@@ -69,6 +88,12 @@ export interface CounterItem {
 	bucket: number;
 	/** Consecutive periods the goal was met. Bumped on a met period, reset to 0 otherwise. */
 	streak: number;
+	/**
+	 * Streak value broken at the most recent reset, recoverable only during the
+	 * current period (a "streak freeze" for when the user forgot to act in time).
+	 * 0 when there is nothing to restore.
+	 */
+	lostStreak: number;
 }
 
 /**
@@ -164,14 +189,16 @@ function sanitize(raw: unknown): CounterItem | null {
 	const period: Period = isPeriod(o.period) ? o.period : 'hour';
 	const storedBucket = Number(o.bucket);
 	const streak = Number(o.streak);
+	const lostStreak = Number(o.lostStreak);
 	return {
 		id,
 		name,
-		goal: Number.isFinite(goal) && goal !== 0 ? goal : 1,
+		goal: Number.isFinite(goal) ? goal : 1,
 		count: Number.isFinite(count) ? count : 0,
 		period,
 		bucket: Number.isFinite(storedBucket) ? storedBucket : periodBucket(period),
-		streak: Number.isFinite(streak) && streak >= 0 ? streak : 0
+		streak: Number.isFinite(streak) && streak >= 0 ? streak : 0,
+		lostStreak: Number.isFinite(lostStreak) && lostStreak >= 0 ? lostStreak : 0
 	};
 }
 
@@ -202,7 +229,8 @@ function load(): CounterItem[] {
 				count: Number.isFinite(count) ? count : 0,
 				period: 'hour',
 				bucket: periodBucket('hour'),
-				streak: 0
+				streak: 0,
+				lostStreak: 0
 			}
 		];
 	}
@@ -213,6 +241,8 @@ function load(): CounterItem[] {
 /** Reactive collection of counters, persisted to localStorage; each resets on its own period. */
 class CounterStore {
 	items = $state<CounterItem[]>(load());
+	/** Reactive wall-clock, ticked by the layout, so "time until reset" stays live. */
+	now = $state(browser ? Date.now() : 0);
 
 	#persist(): void {
 		if (!browser) return;
@@ -225,7 +255,7 @@ class CounterStore {
 
 	add(name: string, goal: number, period: Period = 'hour'): void {
 		const safeName = name.trim() || 'Counter';
-		const safeGoal = Number.isFinite(goal) && goal !== 0 ? Math.trunc(goal) : 1;
+		const safeGoal = Number.isFinite(goal) ? Math.trunc(goal) : 1;
 		const safePeriod: Period = isPeriod(period) ? period : 'hour';
 		this.items.push({
 			id: newId(),
@@ -234,7 +264,8 @@ class CounterStore {
 			count: counterStart(safeGoal),
 			period: safePeriod,
 			bucket: periodBucket(safePeriod),
-			streak: 0
+			streak: 0,
+			lostStreak: 0
 		});
 		this.#persist();
 	}
@@ -248,7 +279,7 @@ class CounterStore {
 		const item = this.#find(id);
 		if (!item) return;
 		if (changes.name !== undefined) item.name = changes.name.trim() || 'Counter';
-		if (changes.goal !== undefined && Number.isFinite(changes.goal) && changes.goal !== 0) {
+		if (changes.goal !== undefined && Number.isFinite(changes.goal)) {
 			const newGoal = Math.trunc(changes.goal);
 			// Switching between count-up and count-down re-seeds the count to the new start.
 			if (newGoal < 0 !== item.goal < 0) item.count = counterStart(newGoal);
@@ -294,13 +325,42 @@ class CounterStore {
 				// directly (no empty periods skipped) → streak continues; else broken.
 				const metGoal = goalReached(item.count, item.goal);
 				const consecutive = bucket === nextBucket(item.period, item.bucket);
-				item.streak = metGoal && consecutive ? item.streak + 1 : 0;
+				if (metGoal && consecutive) {
+					item.streak += 1;
+					item.lostStreak = 0;
+				} else {
+					// Remember the broken streak so it can be restored this coming period.
+					// (If it was already 0, any earlier recovery chance now expires.)
+					item.lostStreak = item.streak;
+					item.streak = 0;
+				}
 				item.count = counterStart(item.goal);
 				item.bucket = bucket;
 				changed = true;
 			}
 		}
 		if (changed) this.#persist();
+	}
+
+	/** Advance the reactive clock and reconcile resets in one step. */
+	tick(now: number): void {
+		if (!Number.isFinite(now)) return;
+		this.now = now;
+		this.applyNow(now);
+	}
+
+	/**
+	 * Restore a streak that broke at the most recent reset (the user forgot to act
+	 * in time). Only possible while `lostStreak > 0`, i.e. during the period right
+	 * after the break.
+	 * @param {string} id
+	 */
+	restoreStreak(id: string): void {
+		const item = this.#find(id);
+		if (!item || item.lostStreak <= 0) return;
+		item.streak = item.lostStreak;
+		item.lostStreak = 0;
+		this.#persist();
 	}
 }
 
