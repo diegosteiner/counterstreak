@@ -1,435 +1,515 @@
 :root {
-	/* Surfaces (dark → light) */
-	--bg: #0f172a;
-	--surface: #1e293b;
-	--surface-2: #334155;
-	--surface-3: #475569;
+    /* Surfaces (dark → light) */
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface-2: #334155;
+    --surface-3: #475569;
 
-	/* Text (bright → faint) */
-	--text: #f8fafc;
-	--text-muted: #cbd5e1;
-	--text-dim: #94a3b8;
-	--text-faint: #64748b;
+    /* Text (bright → faint) */
+    --text: #f8fafc;
+    --text-muted: #cbd5e1;
+    --text-dim: #94a3b8;
+    --text-faint: #64748b;
 
-	/* Accents */
-	--accent: #38bdf8;
-	--accent-hover: #7dd3fc;
-	--success: #34d399;
-	--success-bg: #14342b;
-	--streak: #fb923c;
+    /* Accents */
+    --accent: #38bdf8;
+    --accent-hover: #7dd3fc;
+    --success: #34d399;
+    --success-bg: #14342b;
+    --streak: #fb923c;
 
-	/* Restore (amber) */
-	--warn: #f59e0b;
-	--warn-text: #fdba74;
-	--warn-border: #b45309;
-	--warn-bg: #422006;
-	--warn-bg-hover: #532e0a;
+    /* Restore (amber) */
+    --warn: #f59e0b;
+    --warn-text: #fdba74;
+    --warn-border: #b45309;
+    --warn-bg: #422006;
+    --warn-bg-hover: #532e0a;
 
-	/* Destructive (red) */
-	--danger: #f87171;
-	--danger-border: #7f1d1d;
-	--danger-bg-hover: #2a1414;
+    /* Destructive (red) */
+    --danger: #f87171;
+    --danger-border: #7f1d1d;
+    --danger-bg-hover: #2a1414;
 
-	--radius: 0.5rem;
-	--radius-lg: 1rem;
+    --radius: 0.5rem;
+    --radius-lg: 1rem;
 }
 
 /* Global theme reset. */
 body {
-	margin: 0;
-	font-family: system-ui, sans-serif;
-	background: var(--bg);
-	color: var(--text);
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+/* ===========================================================================
+   PWA install prompt  (lib/InstallPrompt.svelte) — fixed banner, all routes
+   =========================================================================== */
+.install {
+    position: fixed;
+    left: 50%;
+    bottom: 1rem;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: max-content;
+    max-width: calc(100% - 2rem);
+    box-sizing: border-box;
+    background: var(--surface);
+    border: 1px solid var(--surface-2);
+    border-radius: var(--radius);
+    padding: 0.6rem 0.75rem;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.4);
+
+    .install-text {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+
+    .install-action {
+        flex: none;
+        background: var(--accent);
+        color: var(--bg);
+        border: none;
+        border-radius: var(--radius);
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+        font-weight: 700;
+        cursor: pointer;
+
+        &:hover {
+            background: var(--accent-hover);
+        }
+    }
+
+    .install-dismiss {
+        flex: none;
+        background: transparent;
+        border: none;
+        color: var(--text-faint);
+        font-size: 1rem;
+        line-height: 1;
+        cursor: pointer;
+
+        &:hover {
+            color: var(--text);
+        }
+    }
 }
 
 /* ===========================================================================
    Counters list  (routes/+page.svelte → <main class="counters">)
    =========================================================================== */
 .counters {
-	min-height: 100dvh;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 0.5rem;
-	padding: 1.5rem;
-	box-sizing: border-box;
-	text-align: center;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    box-sizing: border-box;
+    text-align: center;
 
-	header {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 1rem;
-		width: 100%;
-		max-width: 30rem;
-	}
+    header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        width: 100%;
+        max-width: 30rem;
+    }
 
-	h1 {
-		margin: 0;
-		font-size: 1.5rem;
-		font-weight: 600;
-	}
+    h1 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
 
-	.add-btn {
-		background: var(--accent);
-		color: var(--bg);
-		border: none;
-		border-radius: var(--radius);
-		padding: 0.45rem 0.9rem;
-		font-size: 0.95rem;
-		font-weight: 700;
-		text-decoration: none;
-		cursor: pointer;
+    .add-btn {
+        background: var(--accent);
+        color: var(--bg);
+        border: none;
+        border-radius: var(--radius);
+        padding: 0.45rem 0.9rem;
+        font-size: 0.95rem;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
 
-		&:hover {
-			background: var(--accent-hover);
-		}
-	}
+        &:hover {
+            background: var(--accent-hover);
+        }
+    }
 
-	.empty {
-		margin-top: 3rem;
-		color: var(--text-dim);
-		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
-		align-items: center;
-	}
+    .empty {
+        margin-top: 3rem;
+        color: var(--text-dim);
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: center;
+    }
 
-	.add-link {
-		color: var(--accent);
-		font-size: 0.95rem;
-		font-weight: 600;
-		text-decoration: none;
+    footer {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-top: auto;
+        padding-top: 1rem;
+    }
 
-		&:hover {
-			text-decoration: underline;
-		}
-	}
+    .add-link {
+        color: var(--accent);
+        font-size: 0.95rem;
+        font-weight: 600;
+        text-decoration: none;
 
-	.list {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		width: 100%;
-		max-width: 30rem;
-		display: flex;
-		flex-direction: column;
-		gap: 1.25rem;
-	}
+        &:hover {
+            text-decoration: underline;
+        }
+    }
 
-	.card {
-		background: var(--surface);
-		border: 2px solid transparent;
-		border-radius: var(--radius-lg);
-		padding: 1.25rem;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.5rem;
-		transition: border-color 0.2s ease, background 0.2s ease;
+    .locale {
+        background: var(--surface);
+        border: 1px solid var(--surface-2);
+        color: var(--text-muted);
+        border-radius: var(--radius);
+        padding: 0.3rem 0.5rem;
+        font-size: 0.85rem;
+        cursor: pointer;
 
-		/* Goal met: the whole card and its accents go green. */
-		&.reached {
-			border-color: var(--success);
-			background: var(--success-bg);
+        &:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+    }
 
-			.target {
-				color: var(--success);
-			}
+    .list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        max-width: 30rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
 
-			.bar-fill {
-				background: var(--success);
-			}
-		}
-	}
+    .card {
+        background: var(--surface);
+        border: 2px solid transparent;
+        border-radius: var(--radius-lg);
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        transition:
+            border-color 0.2s ease,
+            background 0.2s ease;
 
-	.card-head {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		width: 100%;
-		gap: 0.5rem;
-	}
+        /* Goal met: the whole card and its accents go green. */
+        &.reached {
+            border-color: var(--success);
+            background: var(--success-bg);
 
-	.name {
-		font-size: 1.1rem;
-		font-weight: 600;
-		flex: 1;
-		text-align: left;
-	}
+            .target {
+                color: var(--success);
+            }
 
-	.streak {
-		font-size: 0.9rem;
-		font-weight: 700;
-		font-variant-numeric: tabular-nums;
-		color: var(--text-faint);
-		filter: grayscale(1);
-		opacity: 0.6;
+            .bar-fill {
+                background: var(--success);
+            }
+        }
+    }
 
-		&.active {
-			color: var(--streak);
-			filter: none;
-			opacity: 1;
-		}
-	}
+    .card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        gap: 0.5rem;
+    }
 
-	.edit {
-		background: transparent;
-		border: 1px solid var(--surface-3);
-		color: var(--text-muted);
-		border-radius: var(--radius);
-		padding: 0.3rem 0.6rem;
-		font-size: 0.8rem;
-		text-decoration: none;
-		cursor: pointer;
+    .name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        flex: 1;
+        text-align: left;
+    }
 
-		&:hover {
-			border-color: var(--text-dim);
-			color: var(--text);
-		}
-	}
+    .streak {
+        font-size: 0.9rem;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        color: var(--text-faint);
+        filter: grayscale(1);
+        opacity: 0.6;
 
-	.counter-row {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-		width: 100%;
+        &.active {
+            color: var(--streak);
+            filter: none;
+            opacity: 1;
+        }
+    }
 
-		/* Count-down goals: swap the buttons so the toward-goal (−) stays on the right. */
-		&.flip .circle:first-child {
-			order: 1;
-		}
+    .edit {
+        background: transparent;
+        color: var(--text-muted);
+        text-decoration: none;
+        cursor: pointer;
 
-		&.flip .circle:last-child {
-			order: -1;
-		}
-	}
+        &:hover {
+            border-color: var(--text-dim);
+            color: var(--text);
+        }
+    }
 
-	/* Count and its goal on one baseline-aligned line, between the −/+ buttons. */
-	.readout {
-		flex: 1;
-		min-width: 0;
-		display: flex;
-		align-items: baseline;
-		justify-content: center;
-		gap: 0.4rem;
-	}
+    .counter-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        width: 100%;
 
-	.count {
-		font-size: clamp(2.25rem, 12vw, 3.5rem);
-		font-weight: 800;
-		line-height: 1;
-		font-variant-numeric: tabular-nums;
-	}
+        /* Count-down goals: swap the buttons so the toward-goal (−) stays on the right. */
+        &.flip .circle:first-child {
+            order: 1;
+        }
 
-	.target {
-		color: var(--text-dim);
-		font-size: 0.95rem;
-		font-variant-numeric: tabular-nums;
-	}
+        &.flip .circle:last-child {
+            order: -1;
+        }
+    }
 
-	.period {
-		color: var(--text-faint);
-		font-size: 0.8rem;
-		font-variant-numeric: tabular-nums;
-	}
+    /* Count and its goal on one baseline-aligned line, between the −/+ buttons. */
+    .readout {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        gap: 0.4rem;
+    }
 
-	.restore {
-		align-self: stretch;
-		background: var(--warn-bg);
-		border: 1px solid var(--warn-border);
-		color: var(--warn-text);
-		border-radius: var(--radius);
-		padding: 0.5rem 0.75rem;
-		font-size: 0.85rem;
-		font-weight: 600;
-		cursor: pointer;
+    .count {
+        font-size: clamp(2.25rem, 12vw, 3.5rem);
+        font-weight: 800;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+    }
 
-		&:hover {
-			background: var(--warn-bg-hover);
-			border-color: var(--warn);
-		}
-	}
+    .target {
+        color: var(--text-dim);
+        font-size: 0.95rem;
+        font-variant-numeric: tabular-nums;
+    }
 
-	.bar {
-		width: 100%;
-		height: 0.5rem;
-		background: var(--surface-2);
-		border-radius: 999px;
-		overflow: hidden;
-	}
+    .period {
+        color: var(--text-faint);
+        font-size: 0.8rem;
+        font-variant-numeric: tabular-nums;
+    }
 
-	.bar-fill {
-		height: 100%;
-		background: var(--accent);
-		border-radius: 999px;
-		transition: width 0.2s ease;
-	}
+    .restore {
+        align-self: stretch;
+        background: var(--warn-bg);
+        border: 1px solid var(--warn-border);
+        color: var(--warn-text);
+        border-radius: var(--radius);
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
 
-	.circle {
-		flex: none;
-		width: 3.5rem;
-		height: 3.5rem;
-		border-radius: 50%;
-		border: none;
-		font-size: 1.75rem;
-		font-weight: 700;
-		cursor: pointer;
-		display: grid;
-		place-items: center;
-		transition: transform 0.08s ease, background 0.15s ease;
-		user-select: none;
-		-webkit-tap-highlight-color: transparent;
+        &:hover {
+            background: var(--warn-bg-hover);
+            border-color: var(--warn);
+        }
+    }
 
-		&:active {
-			transform: scale(0.92);
-		}
+    .bar {
+        width: 100%;
+        height: 0.5rem;
+        background: var(--surface-2);
+        border-radius: 999px;
+        overflow: hidden;
+    }
 
-		/* The button that moves toward the goal is emphasized via color. */
-		&.primary {
-			color: var(--bg);
-			background: var(--accent);
+    .bar-fill {
+        height: 100%;
+        background: var(--accent);
+        border-radius: 999px;
+        transition: width 0.2s ease;
+    }
 
-			&:hover {
-				background: var(--accent-hover);
-			}
-		}
+    .circle {
+        flex: none;
+        width: 3.5rem;
+        height: 3.5rem;
+        border-radius: 50%;
+        border: none;
+        font-size: 1.75rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        transition:
+            transform 0.08s ease,
+            background 0.15s ease;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
 
-		&.secondary {
-			color: var(--text-muted);
-			background: var(--surface-2);
+        &:active {
+            transform: scale(0.92);
+        }
 
-			&:hover {
-				background: var(--surface-3);
-			}
-		}
-	}
+        /* The button that moves toward the goal is emphasized via color. */
+        &.primary {
+            color: var(--bg);
+            background: var(--accent);
+
+            &:hover {
+                background: var(--accent-hover);
+            }
+        }
+
+        &.secondary {
+            color: var(--text-muted);
+            background: var(--surface-2);
+
+            &:hover {
+                background: var(--surface-3);
+            }
+        }
+    }
 }
 
 /* ===========================================================================
    Counter editor  (lib/CounterForm.svelte → <main class="editor">)
    =========================================================================== */
 .editor {
-	min-height: 100dvh;
-	padding: 1.5rem;
-	box-sizing: border-box;
-	max-width: 26rem;
-	margin: 0 auto;
+    min-height: 100dvh;
+    padding: 1.5rem;
+    box-sizing: border-box;
+    max-width: 26rem;
+    margin: 0 auto;
 
-	header {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-		margin-bottom: 1.5rem;
-	}
+    header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
 
-	h1 {
-		margin: 0;
-		font-size: 1.4rem;
-		font-weight: 600;
-	}
+    h1 {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 600;
+    }
 
-	.back {
-		color: var(--accent);
-		text-decoration: none;
-		font-weight: 600;
+    .back {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 600;
 
-		&:hover {
-			text-decoration: underline;
-		}
-	}
+        &:hover {
+            text-decoration: underline;
+        }
+    }
 
-	.missing {
-		color: var(--text-dim);
-	}
+    .missing {
+        color: var(--text-dim);
+    }
 
-	.panel {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-	}
+    .panel {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
 
-	label {
-		display: flex;
-		flex-direction: column;
-		gap: 0.35rem;
-		font-size: 0.9rem;
-		color: var(--text-muted);
-	}
+    label {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
 
-	.field {
-		background: var(--surface);
-		border: 1px solid var(--surface-2);
-		border-radius: var(--radius);
-		color: var(--text);
-		padding: 0.6rem 0.75rem;
-		font-size: 1rem;
-		box-sizing: border-box;
+    .field {
+        background: var(--surface);
+        border: 1px solid var(--surface-2);
+        border-radius: var(--radius);
+        color: var(--text);
+        padding: 0.6rem 0.75rem;
+        font-size: 1rem;
+        box-sizing: border-box;
 
-		&:focus {
-			outline: none;
-			border-color: var(--accent);
-		}
-	}
+        &:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+    }
 
-	.help {
-		color: var(--text-faint);
-		font-size: 0.78rem;
-	}
+    .help {
+        color: var(--text-faint);
+        font-size: 0.78rem;
+    }
 
-	.actions {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		margin-top: 0.25rem;
-	}
+    .actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.25rem;
+    }
 
-	.spacer {
-		flex: 1;
-	}
+    .spacer {
+        flex: 1;
+    }
 
-	.primary {
-		background: var(--accent);
-		color: var(--bg);
-		border: none;
-		border-radius: var(--radius);
-		padding: 0.55rem 1rem;
-		font-size: 0.95rem;
-		font-weight: 700;
-		cursor: pointer;
+    .primary {
+        background: var(--accent);
+        color: var(--bg);
+        border: none;
+        border-radius: var(--radius);
+        padding: 0.55rem 1rem;
+        font-size: 0.95rem;
+        font-weight: 700;
+        cursor: pointer;
 
-		&:hover {
-			background: var(--accent-hover);
-		}
-	}
+        &:hover {
+            background: var(--accent-hover);
+        }
+    }
 
-	.ghost {
-		background: transparent;
-		border: 1px solid var(--surface-3);
-		color: var(--text-muted);
-		border-radius: var(--radius);
-		padding: 0.55rem 1rem;
-		font-size: 0.95rem;
-		cursor: pointer;
+    .ghost {
+        background: transparent;
+        border: 1px solid var(--surface-3);
+        color: var(--text-muted);
+        border-radius: var(--radius);
+        padding: 0.55rem 1rem;
+        font-size: 0.95rem;
+        cursor: pointer;
 
-		&:hover {
-			border-color: var(--text-dim);
-			color: var(--text);
-		}
-	}
+        &:hover {
+            border-color: var(--text-dim);
+            color: var(--text);
+        }
+    }
 
-	.danger {
-		background: transparent;
-		border: 1px solid var(--danger-border);
-		color: var(--danger);
-		border-radius: var(--radius);
-		padding: 0.55rem 1rem;
-		font-size: 0.95rem;
-		cursor: pointer;
+    .danger {
+        background: transparent;
+        border: 1px solid var(--danger-border);
+        color: var(--danger);
+        border-radius: var(--radius);
+        padding: 0.55rem 1rem;
+        font-size: 0.95rem;
+        cursor: pointer;
 
-		&:hover {
-			border-color: var(--danger);
-			background: var(--danger-bg-hover);
-		}
-	}
+        &:hover {
+            border-color: var(--danger);
+            background: var(--danger-bg-hover);
+        }
+    }
 }

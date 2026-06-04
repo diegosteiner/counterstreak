@@ -7,15 +7,6 @@ export type Period = 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year';
 
 export const PERIODS: Period[] = ['minute', 'hour', 'day', 'week', 'month', 'year'];
 
-export const PERIOD_LABELS: Record<Period, string> = {
-	minute: 'Every minute',
-	hour: 'Hourly',
-	day: 'Daily',
-	week: 'Weekly',
-	month: 'Monthly',
-	year: 'Yearly'
-};
-
 /**
  * Where a counter sits at the start of each period: 0 for a positive (count-up)
  * goal, or `|goal|` for a negative (count-down) goal.
@@ -48,20 +39,38 @@ export function goalProgress(count: number, goal: number): number {
 	return Math.max(0, Math.min(1, frac));
 }
 
+/** Unit labels for {@link formatDuration}; defaults are language-neutral abbreviations. */
+export interface DurationLabels {
+	now: string;
+	second: string;
+	minute: string;
+	hour: string;
+	day: string;
+}
+
+const DEFAULT_DURATION_LABELS: DurationLabels = {
+	now: 'now',
+	second: 's',
+	minute: 'm',
+	hour: 'h',
+	day: 'd'
+};
+
 /**
  * Human-friendly "time left" string for a millisecond duration, e.g. `42s`,
- * `12m`, `3h 20m`, `2d 4h`. Returns `now` at or past zero.
+ * `12m`, `3h 20m`, `2d 4h`. Returns the `now` label at or past zero. Unit labels
+ * are injected so callers can localize them.
  */
-export function formatDuration(ms: number): string {
-	if (ms <= 0) return 'now';
+export function formatDuration(ms: number, labels: DurationLabels = DEFAULT_DURATION_LABELS): string {
+	if (ms <= 0) return labels.now;
 	const totalSec = Math.floor(ms / 1000);
-	if (totalSec < 60) return `${totalSec}s`;
+	if (totalSec < 60) return `${totalSec}${labels.second}`;
 	const totalMin = Math.floor(totalSec / 60);
-	if (totalMin < 60) return `${totalMin}m`;
+	if (totalMin < 60) return `${totalMin}${labels.minute}`;
 	const totalHr = Math.floor(totalMin / 60);
-	if (totalHr < 24) return `${totalHr}h ${totalMin % 60}m`;
+	if (totalHr < 24) return `${totalHr}${labels.hour} ${totalMin % 60}${labels.minute}`;
 	const days = Math.floor(totalHr / 24);
-	return `${days}d ${totalHr % 24}h`;
+	return `${days}${labels.day} ${totalHr % 24}${labels.hour}`;
 }
 
 /** A single named counter with a target (goal) value and a reset period. */

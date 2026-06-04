@@ -2,9 +2,16 @@
 	import { onMount } from 'svelte';
 	import favicon from '$lib/assets/favicon.svg';
 	import { counters } from '$lib/counter.svelte';
+	import { getLocale } from '$lib/i18n.svelte';
+	import InstallPrompt from '$lib/InstallPrompt.svelte';
 	import '../app.css';
 
 	let { children } = $props();
+
+	// Keep the document language in sync with the active locale.
+	$effect(() => {
+		document.documentElement.lang = getLocale();
+	});
 
 	onMount(() => {
 		// Local clock drives both the live "time until reset" display and the
@@ -31,3 +38,5 @@
 </svelte:head>
 
 {@render children()}
+
+<InstallPrompt />
