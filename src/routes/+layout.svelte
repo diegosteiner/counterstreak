@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import favicon from '$lib/assets/favicon.svg';
 	import { counters } from '$lib/counter.svelte';
+	import '../app.css';
 
 	let { children } = $props();
 
@@ -12,12 +13,7 @@
 		const onVisible = () => {
 			if (document.visibilityState === 'visible') tick();
 		};
-		/** @param {MessageEvent} event */
-		const onMessage = (event) => {
-			if (event.data?.type === 'TIME') counters.tick(event.data.now);
-		};
 
-		navigator.serviceWorker?.addEventListener('message', onMessage);
 		document.addEventListener('visibilitychange', onVisible);
 
 		tick();
@@ -25,7 +21,6 @@
 
 		return () => {
 			clearInterval(interval);
-			navigator.serviceWorker?.removeEventListener('message', onMessage);
 			document.removeEventListener('visibilitychange', onVisible);
 		};
 	});

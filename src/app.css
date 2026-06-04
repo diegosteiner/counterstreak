@@ -1,0 +1,418 @@
+:root {
+	/* Surfaces (dark → light) */
+	--bg: #0f172a;
+	--surface: #1e293b;
+	--surface-2: #334155;
+	--surface-3: #475569;
+
+	/* Text (bright → faint) */
+	--text: #f8fafc;
+	--text-muted: #cbd5e1;
+	--text-dim: #94a3b8;
+	--text-faint: #64748b;
+
+	/* Accents */
+	--accent: #38bdf8;
+	--accent-hover: #7dd3fc;
+	--success: #34d399;
+	--success-bg: #14342b;
+	--streak: #fb923c;
+
+	/* Restore (amber) */
+	--warn: #f59e0b;
+	--warn-text: #fdba74;
+	--warn-border: #b45309;
+	--warn-bg: #422006;
+	--warn-bg-hover: #532e0a;
+
+	/* Destructive (red) */
+	--danger: #f87171;
+	--danger-border: #7f1d1d;
+	--danger-bg-hover: #2a1414;
+
+	--radius: 0.5rem;
+	--radius-lg: 1rem;
+}
+
+/* Global theme reset. */
+body {
+	margin: 0;
+	font-family: system-ui, sans-serif;
+	background: var(--bg);
+	color: var(--text);
+}
+
+/* ===========================================================================
+   Counters list  (routes/+page.svelte → <main class="counters">)
+   =========================================================================== */
+.counters {
+	min-height: 100dvh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 1.5rem;
+	box-sizing: border-box;
+	text-align: center;
+
+	header {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 1rem;
+		width: 100%;
+		max-width: 30rem;
+	}
+
+	h1 {
+		margin: 0;
+		font-size: 1.5rem;
+		font-weight: 600;
+	}
+
+	.add-btn {
+		background: var(--accent);
+		color: var(--bg);
+		border: none;
+		border-radius: var(--radius);
+		padding: 0.45rem 0.9rem;
+		font-size: 0.95rem;
+		font-weight: 700;
+		text-decoration: none;
+		cursor: pointer;
+
+		&:hover {
+			background: var(--accent-hover);
+		}
+	}
+
+	.empty {
+		margin-top: 3rem;
+		color: var(--text-dim);
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		align-items: center;
+	}
+
+	.add-link {
+		color: var(--accent);
+		font-size: 0.95rem;
+		font-weight: 600;
+		text-decoration: none;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+
+	.list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		width: 100%;
+		max-width: 30rem;
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+	}
+
+	.card {
+		background: var(--surface);
+		border: 2px solid transparent;
+		border-radius: var(--radius-lg);
+		padding: 1.25rem;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.5rem;
+		transition: border-color 0.2s ease, background 0.2s ease;
+
+		/* Goal met: the whole card and its accents go green. */
+		&.reached {
+			border-color: var(--success);
+			background: var(--success-bg);
+
+			.target {
+				color: var(--success);
+			}
+
+			.bar-fill {
+				background: var(--success);
+			}
+		}
+	}
+
+	.card-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		width: 100%;
+		gap: 0.5rem;
+	}
+
+	.name {
+		font-size: 1.1rem;
+		font-weight: 600;
+		flex: 1;
+		text-align: left;
+	}
+
+	.streak {
+		font-size: 0.9rem;
+		font-weight: 700;
+		font-variant-numeric: tabular-nums;
+		color: var(--text-faint);
+		filter: grayscale(1);
+		opacity: 0.6;
+
+		&.active {
+			color: var(--streak);
+			filter: none;
+			opacity: 1;
+		}
+	}
+
+	.edit {
+		background: transparent;
+		border: 1px solid var(--surface-3);
+		color: var(--text-muted);
+		border-radius: var(--radius);
+		padding: 0.3rem 0.6rem;
+		font-size: 0.8rem;
+		text-decoration: none;
+		cursor: pointer;
+
+		&:hover {
+			border-color: var(--text-dim);
+			color: var(--text);
+		}
+	}
+
+	.count {
+		font-size: clamp(3rem, 18vw, 5rem);
+		font-weight: 800;
+		line-height: 1;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.target {
+		color: var(--text-dim);
+		font-size: 0.95rem;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.period {
+		color: var(--text-faint);
+		font-size: 0.8rem;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.restore {
+		align-self: stretch;
+		background: var(--warn-bg);
+		border: 1px solid var(--warn-border);
+		color: var(--warn-text);
+		border-radius: var(--radius);
+		padding: 0.5rem 0.75rem;
+		font-size: 0.85rem;
+		font-weight: 600;
+		cursor: pointer;
+
+		&:hover {
+			background: var(--warn-bg-hover);
+			border-color: var(--warn);
+		}
+	}
+
+	.bar {
+		width: 100%;
+		height: 0.5rem;
+		background: var(--surface-2);
+		border-radius: 999px;
+		overflow: hidden;
+		margin: 0.25rem 0 0.75rem;
+	}
+
+	.bar-fill {
+		height: 100%;
+		background: var(--accent);
+		border-radius: 999px;
+		transition: width 0.2s ease;
+	}
+
+	.controls {
+		display: flex;
+		align-items: center;
+		gap: 1.5rem;
+	}
+
+	.circle {
+		border-radius: 50%;
+		border: none;
+		font-weight: 700;
+		cursor: pointer;
+		display: grid;
+		place-items: center;
+		transition: transform 0.08s ease, background 0.15s ease;
+		user-select: none;
+		-webkit-tap-highlight-color: transparent;
+
+		&:active {
+			transform: scale(0.92);
+		}
+
+		/* The button that moves toward the goal is emphasized as the main action. */
+		&.primary {
+			width: 5.5rem;
+			height: 5.5rem;
+			font-size: 2.75rem;
+			color: var(--bg);
+			background: var(--accent);
+
+			&:hover {
+				background: var(--accent-hover);
+			}
+		}
+
+		&.secondary {
+			width: 3rem;
+			height: 3rem;
+			font-size: 1.5rem;
+			color: var(--text-muted);
+			background: var(--surface-2);
+
+			&:hover {
+				background: var(--surface-3);
+			}
+		}
+	}
+}
+
+/* ===========================================================================
+   Counter editor  (lib/CounterForm.svelte → <main class="editor">)
+   =========================================================================== */
+.editor {
+	min-height: 100dvh;
+	padding: 1.5rem;
+	box-sizing: border-box;
+	max-width: 26rem;
+	margin: 0 auto;
+
+	header {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		margin-bottom: 1.5rem;
+	}
+
+	h1 {
+		margin: 0;
+		font-size: 1.4rem;
+		font-weight: 600;
+	}
+
+	.back {
+		color: var(--accent);
+		text-decoration: none;
+		font-weight: 600;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+
+	.missing {
+		color: var(--text-dim);
+	}
+
+	.panel {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	label {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+		font-size: 0.9rem;
+		color: var(--text-muted);
+	}
+
+	.field {
+		background: var(--surface);
+		border: 1px solid var(--surface-2);
+		border-radius: var(--radius);
+		color: var(--text);
+		padding: 0.6rem 0.75rem;
+		font-size: 1rem;
+		box-sizing: border-box;
+
+		&:focus {
+			outline: none;
+			border-color: var(--accent);
+		}
+	}
+
+	.help {
+		color: var(--text-faint);
+		font-size: 0.78rem;
+	}
+
+	.actions {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-top: 0.25rem;
+	}
+
+	.spacer {
+		flex: 1;
+	}
+
+	.primary {
+		background: var(--accent);
+		color: var(--bg);
+		border: none;
+		border-radius: var(--radius);
+		padding: 0.55rem 1rem;
+		font-size: 0.95rem;
+		font-weight: 700;
+		cursor: pointer;
+
+		&:hover {
+			background: var(--accent-hover);
+		}
+	}
+
+	.ghost {
+		background: transparent;
+		border: 1px solid var(--surface-3);
+		color: var(--text-muted);
+		border-radius: var(--radius);
+		padding: 0.55rem 1rem;
+		font-size: 0.95rem;
+		cursor: pointer;
+
+		&:hover {
+			border-color: var(--text-dim);
+			color: var(--text);
+		}
+	}
+
+	.danger {
+		background: transparent;
+		border: 1px solid var(--danger-border);
+		color: var(--danger);
+		border-radius: var(--radius);
+		padding: 0.55rem 1rem;
+		font-size: 0.95rem;
+		cursor: pointer;
+
+		&:hover {
+			border-color: var(--danger);
+			background: var(--danger-bg-hover);
+		}
+	}
+}

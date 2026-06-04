@@ -1,7 +1,7 @@
 {
-	"name": "Counter",
-	"short_name": "Counter",
-	"description": "A simple offline counter that resets every hour.",
+	"name": "CounterStreak",
+	"short_name": "CounterStreak",
+	"description": "Offline habit counters that reset on a schedule and build streaks.",
 	"start_url": "/",
 	"scope": "/",
 	"display": "standalone",

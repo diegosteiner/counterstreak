@@ -2,9 +2,6 @@ import { browser } from '$app/environment';
 
 const LIST_KEY = 'counters:list';
 
-// Legacy keys (pre multi-counter / pre per-counter period). Migrated on first load.
-const LEGACY_COUNT_KEY = 'counter:count';
-
 /** How often a counter resets to 0. */
 export type Period = 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year';
 
@@ -22,19 +19,14 @@ export const PERIOD_LABELS: Record<Period, string> = {
 /**
  * Where a counter sits at the start of each period: 0 for a positive (count-up)
  * goal, or `|goal|` for a negative (count-down) goal.
- * @param {number} goal
- * @returns {number}
  */
-export function counterStart(goal: number): number {
+function counterStart(goal: number): number {
 	return goal < 0 ? -goal : 0;
 }
 
 /**
  * Whether the goal has been met: reaching `goal` while counting up, or reaching
  * 0 (or below) while counting down. A goal of 0 is always met (count-up).
- * @param {number} count
- * @param {number} goal
- * @returns {boolean}
  */
 export function goalReached(count: number, goal: number): boolean {
 	if (goal === 0) return true;
@@ -44,9 +36,6 @@ export function goalReached(count: number, goal: number): boolean {
 /**
  * Progress toward the goal as a 0..1 fraction (clamped). Counting up it's
  * `count / goal`; counting down it's how far we've descended from `|goal|` to 0.
- * @param {number} count
- * @param {number} goal
- * @returns {number}
  */
 export function goalProgress(count: number, goal: number): number {
 	let frac: number;
@@ -62,8 +51,6 @@ export function goalProgress(count: number, goal: number): number {
 /**
  * Human-friendly "time left" string for a millisecond duration, e.g. `42s`,
  * `12m`, `3h 20m`, `2d 4h`. Returns `now` at or past zero.
- * @param {number} ms
- * @returns {string}
  */
 export function formatDuration(ms: number): string {
 	if (ms <= 0) return 'now';
@@ -78,7 +65,7 @@ export function formatDuration(ms: number): string {
 }
 
 /** A single named counter with a target (goal) value and a reset period. */
-export interface CounterItem {
+interface CounterItem {
 	id: string;
 	name: string;
 	goal: number;
@@ -100,11 +87,8 @@ export interface CounterItem {
  * Stable identifier (epoch-ms at the start of the period) for the period that
  * `date` falls in. When this value changes between checks, the counter has
  * rolled over to a new period and resets.
- * @param {Period} period
- * @param {Date} [date]
- * @returns {number}
  */
-export function periodBucket(period: Period, date: Date = new Date()): number {
+function periodBucket(period: Period, date: Date = new Date()): number {
 	const d = new Date(date.getTime());
 	switch (period) {
 		case 'minute':
@@ -138,9 +122,6 @@ export function periodBucket(period: Period, date: Date = new Date()): number {
  * Bucket of the period immediately following the one identified by `bucket`.
  * Used to tell whether a reset crossed exactly one period (streak continues) or
  * skipped one or more empty periods (streak broken).
- * @param {Period} period
- * @param {number} bucket
- * @returns {number}
  */
 export function nextBucket(period: Period, bucket: number): number {
 	const d = new Date(bucket);
@@ -183,8 +164,7 @@ function sanitize(raw: unknown): CounterItem | null {
 	const o = raw as Record<string, unknown>;
 	const id = typeof o.id === 'string' ? o.id : newId();
 	const name = typeof o.name === 'string' ? o.name : '';
-	// `o.max` is the legacy field name; fall back to it for data persisted before the rename.
-	const goal = Number(o.goal ?? o.max);
+	const goal = Number(o.goal);
 	const count = Number(o.count);
 	const period: Period = isPeriod(o.period) ? o.period : 'hour';
 	const storedBucket = Number(o.bucket);
@@ -213,26 +193,8 @@ function load(): CounterItem[] {
 				return parsed.map(sanitize).filter((c): c is CounterItem => c !== null);
 			}
 		} catch {
-			// fall through to migration / empty
+			// fall through to empty
 		}
-	}
-
-	// Migrate a legacy single hourly counter so existing users keep their value.
-	const legacy = localStorage.getItem(LEGACY_COUNT_KEY);
-	if (legacy !== null) {
-		const count = Number(legacy);
-		return [
-			{
-				id: newId(),
-				name: 'Counter',
-				goal: 10,
-				count: Number.isFinite(count) ? count : 0,
-				period: 'hour',
-				bucket: periodBucket('hour'),
-				streak: 0,
-				lostStreak: 0
-			}
-		];
 	}
 
 	return [];
@@ -311,8 +273,7 @@ class CounterStore {
 	 * Reconcile every counter against the current time. When a counter's period
 	 * has rolled over, advance or break its streak based on whether the goal was
 	 * met in the period that just ended, then reset the count for the new period.
-	 * Called from the layout on open / focus / interval / SW tick.
-	 * @param {number} now epoch-ms
+	 * `now` is epoch-ms; called from the layout on open / focus / interval.
 	 */
 	applyNow(now: number): void {
 		if (!Number.isFinite(now)) return;
@@ -353,7 +314,6 @@ class CounterStore {
 	 * Restore a streak that broke at the most recent reset (the user forgot to act
 	 * in time). Only possible while `lostStreak > 0`, i.e. during the period right
 	 * after the break.
-	 * @param {string} id
 	 */
 	restoreStreak(id: string): void {
 		const item = this.#find(id);
@@ -366,9 +326,9 @@ class CounterStore {
 
 export const counters = new CounterStore();
 
-// On first load (in the browser), reconcile against the real clock immediately —
-// the service worker confirms this shortly after, but this avoids a flash of a
-// stale count before the SW responds.
+// On first load (in the browser), reconcile against the real clock immediately
+// so counters never render a stale count from a period that already rolled over.
+// The layout's tick loop keeps them current thereafter.
 if (browser) {
 	counters.applyNow(Date.now());
 }
