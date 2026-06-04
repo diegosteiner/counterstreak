@@ -65,7 +65,7 @@ export function formatDuration(ms: number): string {
 }
 
 /** A single named counter with a target (goal) value and a reset period. */
-interface CounterItem {
+export interface CounterItem {
 	id: string;
 	name: string;
 	goal: number;

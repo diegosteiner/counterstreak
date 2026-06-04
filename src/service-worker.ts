@@ -1,6 +1,6 @@
 /// <reference types="@sveltejs/kit" />
 /// <reference lib="webworker" />
-import { build, files, prerendered, version } from "$service-worker";
+import { base, build, files, prerendered, version } from "$service-worker";
 
 const sw = self as unknown as ServiceWorkerGlobalScope;
 const CACHE = `cache-${version}`;
@@ -35,7 +35,7 @@ sw.addEventListener("fetch", (event) => {
                 const response = await fetch(request);
                 return response;
             } catch (error) {
-                const fallback = await cache.match("/");
+                const fallback = await cache.match(`${base}/`);
                 if (fallback) return fallback;
                 throw error;
             }

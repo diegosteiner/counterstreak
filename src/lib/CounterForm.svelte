@@ -1,6 +1,7 @@
 <script>
 	import { untrack } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import { counters, PERIODS, PERIOD_LABELS } from '$lib/counter.svelte';
 
 	let { id } = $props();
@@ -16,7 +17,7 @@
 	let period = $state(/** @type {import('$lib/counter.svelte').Period} */ (seed?.period ?? 'hour'));
 
 	function back() {
-		goto('/');
+		goto(`${base}/`);
 	}
 
 	function save() {
@@ -39,7 +40,7 @@
 
 <main class="editor">
 	<header>
-		<a class="back" href="/">← Back</a>
+		<a class="back" href="{base}/">← Back</a>
 		<h1>{isNew ? 'New counter' : 'Edit counter'}</h1>
 	</header>
 

@@ -8,9 +8,14 @@ const config: Config = {
 	},
 	kit: {
 		// Fully static build so the app can be precached and served offline.
+		// 404.html is the SPA fallback GitHub Pages serves for unknown deep links.
 		adapter: adapter({
-			fallback: 'index.html'
-		})
+			fallback: '404.html'
+		}),
+		// GitHub project pages serve from /<repo>; the deploy workflow sets BASE_PATH.
+		paths: {
+			base: process.env.BASE_PATH ?? ''
+		}
 	}
 };
 
