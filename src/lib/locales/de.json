@@ -1,0 +1,56 @@
+{
+	"app": {
+		"title": "Zähler"
+	},
+	"home": {
+		"heading": "Zähler",
+		"empty": "Noch keine Zähler.",
+		"addOne": "Einen hinzufügen",
+		"language": "Sprache"
+	},
+	"install": {
+		"message": "CounterStreak für schnellen Zugriff und Offline-Nutzung installieren.",
+		"action": "Installieren",
+		"dismiss": "Schließen"
+	},
+	"card": {
+		"edit": "Bearbeiten",
+		"editAria": "{{name}} bearbeiten",
+		"incrementAria": "{{name}} erhöhen",
+		"decrementAria": "{{name}} verringern",
+		"streakTitle_one": "{{count}} Periode in Folge",
+		"streakTitle_other": "{{count}} Perioden in Folge",
+		"restore": "Serie wiederherstellen",
+		"resetsIn": "zurückgesetzt in {{duration}}"
+	},
+	"editor": {
+		"titleNew": "Neuer Zähler",
+		"titleEdit": "Zähler bearbeiten",
+		"back": "← Zurück",
+		"notFound": "Zähler nicht gefunden.",
+		"name": "Name",
+		"namePlaceholder": "Name des Zählers",
+		"goal": "Ziel",
+		"goalPlaceholder": "Ziel",
+		"goalHelp": "Negative Werte zählen von ihrem Betrag auf 0 herunter.",
+		"resets": "Zurücksetzen",
+		"delete": "Löschen",
+		"cancel": "Abbrechen",
+		"save": "Speichern"
+	},
+	"period": {
+		"minute": "Jede Minute",
+		"hour": "Stündlich",
+		"day": "Täglich",
+		"week": "Wöchentlich",
+		"month": "Monatlich",
+		"year": "Jährlich"
+	},
+	"duration": {
+		"now": "jetzt",
+		"second": "s",
+		"minute": "m",
+		"hour": "h",
+		"day": "d"
+	}
+}

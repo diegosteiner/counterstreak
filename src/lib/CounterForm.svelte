@@ -37,49 +37,63 @@
 		if (existing) counters.remove(existing.id);
 		back();
 	}
+
+	const fieldClass =
+		'rounded-lg border border-surface-2 bg-surface px-3 py-[0.6rem] text-base text-text focus:border-accent focus:outline-none';
 </script>
 
-<main class="editor">
-	<header>
-		<a class="back" href="{base}/">{t('editor.back')}</a>
-		<h1>{isNew ? t('editor.titleNew') : t('editor.titleEdit')}</h1>
+<main class="mx-auto min-h-dvh max-w-[26rem] p-6">
+	<header class="mb-6 flex items-center gap-4">
+		<a class="font-semibold text-accent no-underline hover:underline" href="{base}/">{t('editor.back')}</a>
+		<h1 class="text-[1.4rem] font-semibold">{isNew ? t('editor.titleNew') : t('editor.titleEdit')}</h1>
 	</header>
 
 	{#if !isNew && !existing}
-		<p class="missing">{t('editor.notFound')}</p>
+		<p class="text-dim">{t('editor.notFound')}</p>
 	{:else}
 		<form
-			class="panel"
+			class="flex flex-col gap-4"
 			onsubmit={(e) => {
 				e.preventDefault();
 				save();
 			}}
 		>
-			<label>
+			<label class="flex flex-col gap-[0.35rem] text-[0.9rem] text-muted">
 				{t('editor.name')}
-				<input class="field" type="text" placeholder={t('editor.namePlaceholder')} bind:value={name} />
+				<input class={fieldClass} type="text" placeholder={t('editor.namePlaceholder')} bind:value={name} />
 			</label>
-			<label>
+			<label class="flex flex-col gap-[0.35rem] text-[0.9rem] text-muted">
 				{t('editor.goal')}
-				<input class="field" type="number" step="1" placeholder={t('editor.goalPlaceholder')} bind:value={goal} />
-				<small class="help">{t('editor.goalHelp')}</small>
+				<input class={fieldClass} type="number" step="1" placeholder={t('editor.goalPlaceholder')} bind:value={goal} />
+				<small class="text-[0.78rem] text-faint">{t('editor.goalHelp')}</small>
 			</label>
-			<label>
+			<label class="flex flex-col gap-[0.35rem] text-[0.9rem] text-muted">
 				{t('editor.resets')}
-				<select class="field" bind:value={period}>
+				<select class={fieldClass} bind:value={period}>
 					{#each PERIODS as p (p)}
 						<option value={p}>{t(`period.${p}`)}</option>
 					{/each}
 				</select>
 			</label>
 
-			<div class="actions">
+			<div class="mt-1 flex items-center gap-2">
 				{#if !isNew}
-					<button class="danger" type="button" onclick={remove}>{t('editor.delete')}</button>
+					<button
+						class="cursor-pointer rounded-lg border border-danger-border bg-transparent px-4 py-[0.55rem] text-[0.95rem] text-danger hover:border-danger hover:bg-danger-bg-hover"
+						type="button"
+						onclick={remove}>{t('editor.delete')}</button
+					>
 				{/if}
-				<span class="spacer"></span>
-				<button class="ghost" type="button" onclick={back}>{t('editor.cancel')}</button>
-				<button class="primary" type="submit">{t('editor.save')}</button>
+				<span class="flex-1"></span>
+				<button
+					class="cursor-pointer rounded-lg border border-surface-3 bg-transparent px-4 py-[0.55rem] text-[0.95rem] text-muted hover:border-dim hover:text-text"
+					type="button"
+					onclick={back}>{t('editor.cancel')}</button
+				>
+				<button
+					class="cursor-pointer rounded-lg bg-accent px-4 py-[0.55rem] text-[0.95rem] font-bold text-bg hover:bg-accent-hover"
+					type="submit">{t('editor.save')}</button
+				>
 			</div>
 		</form>
 	{/if}

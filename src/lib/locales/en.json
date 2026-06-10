@@ -1,0 +1,56 @@
+{
+    "app": {
+        "title": "CounterStreak"
+    },
+    "home": {
+        "heading": "CounterSteak",
+        "empty": "No counters yet.",
+        "addOne": "Add one",
+        "language": "Language"
+    },
+    "install": {
+        "message": "Install CounterStreak for quick access and offline use.",
+        "action": "Install",
+        "dismiss": "Dismiss"
+    },
+    "card": {
+        "edit": "Edit",
+        "editAria": "Edit {{name}}",
+        "incrementAria": "Increment {{name}}",
+        "decrementAria": "Decrement {{name}}",
+        "streakTitle_one": "{{count}} period streak",
+        "streakTitle_other": "{{count}} periods streak",
+        "restore": "Restore streak",
+        "resetsIn": "resets in {{duration}}"
+    },
+    "editor": {
+        "titleNew": "New counter",
+        "titleEdit": "Edit counter",
+        "back": "← Back",
+        "notFound": "Counter not found.",
+        "name": "Name",
+        "namePlaceholder": "Counter name",
+        "goal": "Goal",
+        "goalPlaceholder": "Goal",
+        "goalHelp": "Negative counts down from its absolute value to 0.",
+        "resets": "Resets",
+        "delete": "Delete",
+        "cancel": "Cancel",
+        "save": "Save"
+    },
+    "period": {
+        "minute": "Every minute",
+        "hour": "Hourly",
+        "day": "Daily",
+        "week": "Weekly",
+        "month": "Monthly",
+        "year": "Yearly"
+    },
+    "duration": {
+        "now": "now",
+        "second": "s",
+        "minute": "m",
+        "hour": "h",
+        "day": "d"
+    }
+}
