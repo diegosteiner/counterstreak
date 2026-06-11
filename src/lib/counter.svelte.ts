@@ -1,7 +1,8 @@
 import { browser } from "$app/environment";
-import { t } from "./i18n.svelte";
+import { t, getLocale } from "./i18n.svelte";
 
 const LOCAL_STORAGE_KEY = "counters:list";
+const PERIOD_REMINDER_FRACTION = 0.8;
 export const PERIODS = [
   "minute",
   "hour",
@@ -33,6 +34,13 @@ export function goalProgress(count: number, goal: number): number {
   return Math.max(0, Math.min(1, fraction));
 }
 
+export function reminderDue(item: CounterItem, now: number): boolean {
+  if (goalReached(item.count, item.goal)) return false;
+  const end = nextBucket(item.period, item.bucket);
+  const threshold = item.bucket + (end - item.bucket) * PERIOD_REMINDER_FRACTION;
+  return now >= threshold;
+}
+
 export function formatDuration(ms: number): string {
   if (ms <= 0) return t("duration.now");
   const totalSec = Math.floor(ms / 1000);
@@ -44,6 +52,33 @@ export function formatDuration(ms: number): string {
     return `${totalHr}${t("duration.hour")} ${totalMin % 60}${t("duration.minute")}`;
   const days = Math.floor(totalHr / 24);
   return `${days}${t("duration.day")} ${totalHr % 24}${t("duration.hour")}`;
+}
+
+function canNotify(): boolean {
+  return (
+    browser &&
+    typeof Notification !== "undefined" &&
+    Notification.permission === "granted"
+  );
+}
+
+let permissionAsked = false;
+export function ensureNotificationPermission(): void {
+  if (!browser || typeof Notification === "undefined") return;
+  if (permissionAsked || Notification.permission !== "default") return;
+  permissionAsked = true;
+  void Notification.requestPermission();
+}
+
+function sendReminder(item: CounterItem, msLeft: number): void {
+  new Notification(t("notify.title"), {
+    body: t("notify.body", {
+      name: item.name,
+      duration: formatDuration(msLeft),
+    }),
+    tag: `counterstreak-${item.id}`,
+    lang: getLocale(),
+  });
 }
 
 /** A single named counter with a target (goal) value and a reset period. */
@@ -63,6 +98,14 @@ export interface CounterItem {
    * 0 when there is nothing to restore.
    */
   lostStreak: number;
+  /** Whether to send a reminder notification when this counter is overdue. */
+  remind: boolean;
+  /**
+   * Bucket for which a "goal not reached yet" reminder has already been sent, so
+   * each period reminds at most once. Differs from `bucket` until reminded; when
+   * the period rolls over `bucket` changes and a new reminder becomes possible.
+   */
+  notifiedBucket: number;
 }
 
 /**
@@ -152,6 +195,7 @@ function sanitize(raw: unknown): CounterItem | null {
   const storedBucket = Number(o.bucket);
   const streak = Number(o.streak);
   const lostStreak = Number(o.lostStreak);
+  const notifiedBucket = Number(o.notifiedBucket);
   return {
     id,
     name,
@@ -161,6 +205,9 @@ function sanitize(raw: unknown): CounterItem | null {
     bucket: Number.isFinite(storedBucket) ? storedBucket : periodBucket(period),
     streak: Number.isFinite(streak) && streak >= 0 ? streak : 0,
     lostStreak: Number.isFinite(lostStreak) && lostStreak >= 0 ? lostStreak : 0,
+    // Reminders default on for counters predating this setting.
+    remind: typeof o.remind === "boolean" ? o.remind : true,
+    notifiedBucket: Number.isFinite(notifiedBucket) ? notifiedBucket : 0,
   };
 }
 
@@ -197,7 +244,12 @@ class CounterStore {
     return this.items.find((c) => c.id === id);
   }
 
-  add(name: string, goal: number, period: Period = "hour"): void {
+  add(
+    name: string,
+    goal: number,
+    period: Period = "hour",
+    remind = true,
+  ): void {
     const safeName = name.trim() || "Counter";
     const safeGoal = Number.isFinite(goal) ? Math.trunc(goal) : 1;
     const safePeriod: Period = isPeriod(period) ? period : "hour";
@@ -210,8 +262,11 @@ class CounterStore {
       bucket: periodBucket(safePeriod),
       streak: 0,
       lostStreak: 0,
+      remind,
+      notifiedBucket: 0,
     });
     this.#persist();
+    if (remind) ensureNotificationPermission();
   }
 
   remove(id: string): void {
@@ -221,7 +276,7 @@ class CounterStore {
 
   update(
     id: string,
-    changes: { name?: string; goal?: number; period?: Period },
+    changes: { name?: string; goal?: number; period?: Period; remind?: boolean },
   ): void {
     const item = this.#find(id);
     if (!item) return;
@@ -240,6 +295,10 @@ class CounterStore {
       item.period = changes.period;
       item.bucket = periodBucket(changes.period);
     }
+    if (changes.remind !== undefined) {
+      item.remind = changes.remind;
+      if (changes.remind) ensureNotificationPermission();
+    }
     this.#persist();
   }
 
@@ -248,6 +307,7 @@ class CounterStore {
     if (!item) return;
     item.count += 1;
     this.#persist();
+    ensureNotificationPermission();
   }
 
   decrement(id: string): void {
@@ -255,6 +315,7 @@ class CounterStore {
     if (!item) return;
     item.count -= 1;
     this.#persist();
+    ensureNotificationPermission();
   }
 
   /**
@@ -291,11 +352,26 @@ class CounterStore {
     if (changed) this.#persist();
   }
 
-  /** Advance the reactive clock and reconcile resets in one step. */
+  /** Advance the reactive clock, reconcile resets, and fire due reminders. */
   tick(now: number): void {
     if (!Number.isFinite(now)) return;
     this.now = now;
     this.applyNow(now);
+    this.#remind(now);
+  }
+
+  #remind(now: number): void {
+    if (!browser || !canNotify()) return;
+    let changed = false;
+    for (const item of this.items) {
+      if (!item.remind) continue;
+      if (item.notifiedBucket === item.bucket) continue;
+      if (!reminderDue(item, now)) continue;
+      sendReminder(item, nextBucket(item.period, item.bucket) - now);
+      item.notifiedBucket = item.bucket;
+      changed = true;
+    }
+    if (changed) this.#persist();
   }
 
   /**

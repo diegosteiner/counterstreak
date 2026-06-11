@@ -1,7 +1,7 @@
 <script>
 	import { untrack } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
 	import { t } from '$lib/i18n.svelte';
 	import { counters, PERIODS } from '$lib/counter.svelte';
 
@@ -16,9 +16,10 @@
 	let name = $state(seed?.name ?? '');
 	let goal = $state(seed?.goal ?? 10);
 	let period = $state(/** @type {import('$lib/counter.svelte').Period} */ (seed?.period ?? 'hour'));
+	let remind = $state(seed?.remind ?? true);
 
 	function back() {
-		goto(`${base}/`);
+		goto(resolve('/'));
 	}
 
 	function save() {
@@ -26,9 +27,9 @@
 		const g = Number(goal);
 		if (!trimmed || !Number.isFinite(g)) return;
 		if (isNew) {
-			counters.add(trimmed, g, period);
+			counters.add(trimmed, g, period, remind);
 		} else if (existing) {
-			counters.update(existing.id, { name: trimmed, goal: g, period });
+			counters.update(existing.id, { name: trimmed, goal: g, period, remind });
 		}
 		back();
 	}
@@ -44,7 +45,7 @@
 
 <main class="mx-auto min-h-dvh max-w-[26rem] p-6">
 	<header class="mb-6 flex items-center gap-4">
-		<a class="font-semibold text-accent no-underline hover:underline" href="{base}/">{t('editor.back')}</a>
+		<a class="font-semibold text-accent no-underline hover:underline" href={resolve('/')}>{t('editor.back')}</a>
 		<h1 class="text-[1.4rem] font-semibold">{isNew ? t('editor.titleNew') : t('editor.titleEdit')}</h1>
 	</header>
 
@@ -74,6 +75,11 @@
 						<option value={p}>{t(`period.${p}`)}</option>
 					{/each}
 				</select>
+			</label>
+
+			<label class="flex items-center gap-2 text-[0.9rem] text-muted">
+				<input type="checkbox" class="size-4 accent-accent" bind:checked={remind} />
+				{t('editor.remind')}
 			</label>
 
 			<div class="mt-1 flex items-center gap-2">

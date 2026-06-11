@@ -5,11 +5,12 @@
     "home": {
         "heading": "CounterSteak",
         "empty": "No counters yet.",
-        "addOne": "Add one",
-        "language": "Language"
+        "add": "Add counter",
+        "language": "Language",
+        "credits": "CounterStreak by"
     },
     "install": {
-        "message": "Install CounterStreak for quick access and offline use.",
+        "message": "Install CounterStreak.",
         "action": "Install",
         "dismiss": "Dismiss"
     },
@@ -21,12 +22,12 @@
         "streakTitle_one": "{{count}} period streak",
         "streakTitle_other": "{{count}} periods streak",
         "restore": "Restore streak",
-        "resetsIn": "resets in {{duration}}"
+        "resetsIn": "{{duration}} left"
     },
     "editor": {
         "titleNew": "New counter",
         "titleEdit": "Edit counter",
-        "back": "← Back",
+        "back": "← ",
         "notFound": "Counter not found.",
         "name": "Name",
         "namePlaceholder": "Counter name",
@@ -34,6 +35,7 @@
         "goalPlaceholder": "Goal",
         "goalHelp": "Negative counts down from its absolute value to 0.",
         "resets": "Resets",
+        "remind": "Remind me when time is running out",
         "delete": "Delete",
         "cancel": "Cancel",
         "save": "Save"
@@ -52,5 +54,9 @@
         "minute": "m",
         "hour": "h",
         "day": "d"
+    },
+    "notify": {
+        "title": "Don't break your streak!",
+        "body": "{{name}} isn't done yet — resets in {{duration}}."
     }
 }

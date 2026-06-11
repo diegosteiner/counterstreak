@@ -1,17 +1,18 @@
 {
 	"app": {
-		"title": "Zähler"
+		"title": "CounterStreak"
 	},
 	"home": {
-		"heading": "Zähler",
+		"heading": "CounterStreak",
 		"empty": "Noch keine Zähler.",
-		"addOne": "Einen hinzufügen",
-		"language": "Sprache"
+		"add": "Zähler hinzufügen",
+		"language": "Sprache",
+		"credits": "CounterStreak by"
 	},
 	"install": {
-		"message": "CounterStreak für schnellen Zugriff und Offline-Nutzung installieren.",
+		"message": "CounterStreak installieren.",
 		"action": "Installieren",
-		"dismiss": "Schließen"
+		"dismiss": "Schliessen"
 	},
 	"card": {
 		"edit": "Bearbeiten",
@@ -20,20 +21,21 @@
 		"decrementAria": "{{name}} verringern",
 		"streakTitle_one": "{{count}} Periode in Folge",
 		"streakTitle_other": "{{count}} Perioden in Folge",
-		"restore": "Serie wiederherstellen",
-		"resetsIn": "zurückgesetzt in {{duration}}"
+		"restore": "Streak wiederherstellen",
+		"resetsIn": "noch {{duration}}"
 	},
 	"editor": {
 		"titleNew": "Neuer Zähler",
 		"titleEdit": "Zähler bearbeiten",
-		"back": "← Zurück",
+		"back": "← ",
 		"notFound": "Zähler nicht gefunden.",
 		"name": "Name",
-		"namePlaceholder": "Name des Zählers",
+		"namePlaceholder": "Name",
 		"goal": "Ziel",
 		"goalPlaceholder": "Ziel",
 		"goalHelp": "Negative Werte zählen von ihrem Betrag auf 0 herunter.",
 		"resets": "Zurücksetzen",
+		"remind": "Erinnern, wenn die Zeit knapp wird",
 		"delete": "Löschen",
 		"cancel": "Abbrechen",
 		"save": "Speichern"
@@ -52,5 +54,9 @@
 		"minute": "m",
 		"hour": "h",
 		"day": "d"
+	},
+	"notify": {
+		"title": "Halte deinen Streak!",
+		"body": "{{name}} ist noch nicht erledigt – zurückgesetzt in {{duration}}."
 	}
 }
