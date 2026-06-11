@@ -35,7 +35,8 @@
 	<footer class="mt-auto flex items-center justify-space-around gap-4 pt-4">
 		<span class="text-sm text-dim"
 			>{t("home.credits")}
-			<a href="https://openscript.ch">openscript GmbH</a></span
+			<a class="underline" href="https://openscript.ch">openscript GmbH</a
+			></span
 		>
 		<select
 			class="cursor-pointer rounded-lg border border-surface-2 bg-surface px-2 py-[0.3rem] text-[0.85rem] text-muted focus:border-accent focus:outline-none"

@@ -29,30 +29,30 @@
     >
         <div class="flex w-full items-center justify-between gap-2">
             <a
-                class="flex-1 text-left text-[1.1rem] font-semibold"
+                class="flex-1 text-left text-xl py-2 font-semibold"
                 href={resolve("/edit/[id]", { id: item.id })}
                 aria-label={t("card.editAria", { name: item.name })}
             >
                 {item.name}
             </a>
-            <span
-                class="text-[0.9rem] font-bold tabular-nums {item.streak > 0
-                    ? 'text-streak opacity-100 grayscale-0'
-                    : 'text-faint opacity-60 grayscale'}"
-                title={t("card.streakTitle", { count: item.streak })}
-            >
-                🔥 {item.streak}
-            </span>
+            {#if item.lostStreak > 0}
+                <button
+                    class="cursor-pointer self-stretch rounded-lg border border-warn-border bg-warn-bg px-3 py-2 text-[0.85rem] font-semibold text-warn-text hover:border-warn hover:bg-warn-bg-hover"
+                    onclick={() => counters.restoreStreak(item.id)}
+                >
+                    {t("card.restore")} 🔥 {item.lostStreak}
+                </button>
+            {:else}
+                <span
+                    class="text-[0.9rem] font-bold tabular-nums {item.streak > 0
+                        ? 'text-streak opacity-100 grayscale-0'
+                        : 'text-faint opacity-60 grayscale'}"
+                    title={t("card.streakTitle", { count: item.streak })}
+                >
+                    🔥 {item.streak}
+                </span>
+            {/if}
         </div>
-
-        {#if item.lostStreak > 0}
-            <button
-                class="cursor-pointer self-stretch rounded-lg border border-warn-border bg-warn-bg px-3 py-2 text-[0.85rem] font-semibold text-warn-text hover:border-warn hover:bg-warn-bg-hover"
-                onclick={() => counters.restoreStreak(item.id)}
-            >
-                {t("card.restore")} 🔥 {item.lostStreak}
-            </button>
-        {/if}
 
         <div class="flex w-full items-center gap-4">
             <button
