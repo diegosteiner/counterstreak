@@ -1,0 +1,66 @@
+name: Build APK with Bubblewrap
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: Extract version from package.json
+        id: version
+        run: echo "VERSION=$(jq -r '.version' package.json)" >> $GITHUB_OUTPUT
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Bubblewrap
+        run: npm install -g @bubblewrap/cli
+
+      # Generate APK using Bubblewrap
+      - name: Initialize Bubblewrap project
+        run: |
+          mkdir -p bubblewrap-build
+          cd bubblewrap-build
+          bubblewrap init \
+            --manifest="../build/manifest.webmanifest" \
+            --app-name="CounterStreak" \
+            --app-version-code="1" \
+            --app-version="${{ steps.version.outputs.VERSION }}" \
+            --display-mode="standalone" \
+            --orientation="portrait" \
+            --start-url="." \
+            --icon-url="../build/manifest.webmanifest" \
+            --status-bar-color="#000000" \
+            --theme-color="#000000" \
+            --nav-color="#000000" \
+            --package-id="ch.openscript.counterstreak"
+
+      - name: Build APK
+        run: |
+          cd bubblewrap-build
+          bubblewrap build
+
+      # Upload APK as artifact
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: counterstreak-apk
+          path: bubblewrap-build/app/build/outputs/apk/release/*.apk
+          retention-days: 30
