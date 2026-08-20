@@ -37,7 +37,7 @@
             </a>
             {#if item.lostStreak > 0}
                 <button
-                    class="cursor-pointer self-stretch rounded-lg border border-warn-border bg-warn-bg px-3 py-2 text-[0.85rem] font-semibold text-warn-text hover:border-warn hover:bg-warn-bg-hover"
+                    class="cursor-pointer self-stretch rounded-lg border border-warn-border bg-warn-bg px-3 py-2 font-semibold text-warn-text hover:border-warn hover:bg-warn-bg-hover"
                     onclick={() => counters.restoreStreak(item.id)}
                 >
                     {t("card.restore")} 🔥 {item.lostStreak}

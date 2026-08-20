@@ -12,9 +12,12 @@ const config: Config = {
 		adapter: adapter({
 			fallback: '404.html'
 		}),
+		serviceWorker: {
+			register: false
+		},
 		// GitHub project pages serve from /<repo>; the deploy workflow sets BASE_PATH.
 		paths: {
-			base: process.env.BASE_PATH ?? ''
+			base: (process.env.BASE_PATH ?? '') as '' | `/${string}`
 		}
 	}
 };
